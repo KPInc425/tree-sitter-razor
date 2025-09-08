@@ -11,6 +11,14 @@
 
 A Tree-sitter parser for razor files.
 
+## Known Edge Cases & Limitations
+
+This grammar aims to robustly support Razor and Blazor syntax, including directives, nested C# blocks, and semantic highlighting. However, there are some known edge cases and limitations:
+
+- Some rare or ambiguous combinations of Razor and C# constructs (especially deeply nested or mid-line transitions) may not parse as expected.
+- Blending of HTML, Razor, and C# is complex; certain edge cases may require further grammar refinement.
+- If you encounter a parsing issue with a valid Razor construct, please file an issue with a minimal reproducible example.
+
 ## References
 
 <!-- NOTE: add the grammar's references here -->

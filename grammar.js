@@ -114,14 +114,16 @@ module.exports = grammar(CSHARP, {
       seq(
         alias(seq($._razor_marker, "using"), "at_using"),
         choice(
-          seq(optional("unsafe"), field("name", $.identifier), "=", $.type),
+          seq(optional("unsafe"), field("name", $.qualified_name), "=", $.type),
           seq(optional("static"), optional("unsafe"), $._name),
+          $.qualified_name,
+          $.identifier,
         ),
       ),
     razor_model_directive: ($) =>
       seq(
         alias(seq($._razor_marker, "model"), "at_model"),
-        field("name", $._name),
+        field("name", choice($.qualified_name, $.identifier)),
       ),
     razor_preservewhitespace_directive: ($) =>
       seq(
@@ -136,25 +138,39 @@ module.exports = grammar(CSHARP, {
         alias(seq($._razor_marker, "attribute"), "at_attribute"),
         $.attribute_list,
       ),
+
+    // Attribute list and argument parsing for @attribute directive
+    attribute_list: ($) => seq("[", commaSep1($.attribute), "]"),
+
+    attribute: ($) =>
+      seq(
+        choice($.qualified_name, $.identifier),
+        optional($.attribute_argument_list),
+      ),
+
+    attribute_argument_list: ($) =>
+      seq("(", optional(commaSep1($.attribute_argument)), ")"),
+
+    attribute_argument: ($) => choice($.assignment_expression, $.expression),
     razor_implements_directive: ($) =>
       seq(
         alias(seq($._razor_marker, "implements"), "at_implements"),
-        field("name", $._name),
+        field("name", choice($.qualified_name, $.generic_name, $.identifier)),
       ),
     razor_layout_directive: ($) =>
       seq(
         alias(seq($._razor_marker, "layout"), "at_layout"),
-        field("name", $._name),
+        field("name", choice($.qualified_name, $.identifier)),
       ),
     razor_inherits_directive: ($) =>
       seq(
         alias(seq($._razor_marker, "inherits"), "at_inherits"),
-        field("name", $._name),
+        field("name", choice($.qualified_name, $.generic_name, $.identifier)),
       ),
     razor_typeparam_directive: ($) =>
       seq(
         alias(seq($._razor_marker, "typeparam"), "at_typeparam"),
-        field("name", $._name),
+        field("name", $.identifier),
       ),
     razor_inject_directive: ($) =>
       seq(
@@ -437,29 +453,10 @@ module.exports = grammar(CSHARP, {
 
     razor_html_attribute: ($) =>
       seq($.razor_attribute_name, optional(seq("=", $.razor_attribute_value))),
-
-    element: ($) =>
-      seq(
-        "<",
-        $._tag_name,
-        optional(
-          repeat(
-            prec.left(
-              seq(
-                choice(
-                  $._html_attribute,
-                  $._boolean_html_attribute,
-                  $.razor_html_attribute,
-                ),
-                optional(" "),
-              ),
-            ),
-          ),
-        ),
-        choice(
-          "/>",
-          seq(">", repeat(choice($._node, $._html_text)), $._end_tag),
-        ),
-      ),
   },
 });
+
+// Helper for comma-separated lists
+function commaSep1(rule) {
+  return seq(rule, repeat(seq(",", rule)));
+}
