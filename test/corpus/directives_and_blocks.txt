@@ -1,0 +1,135 @@
+tree-sitter-razor\test/corpus\directives_and_blocks.txt
+; Test corpus for Razor directives and nested C# blocks
+
+; =========================
+; @page directive
+; =========================
+@page "/counter"
+----
+(compilation_unit
+  (razor_page_directive
+    (at_page)
+    (string_literal)))
+
+; =========================
+; @inject directive
+; =========================
+@inject WeatherForecastService ForecastService
+----
+(compilation_unit
+  (razor_inject_directive
+    (at_inject)
+    (variable_declaration
+      (type)
+      (variable_declarator))))
+
+; =========================
+; @code block with nested C#
+; =========================
+@code {
+    private int currentCount = 0;
+
+    void IncrementCount()
+    {
+        currentCount++;
+        if (currentCount > 10)
+        {
+            currentCount = 0;
+        }
+    }
+}
+----
+(compilation_unit
+  (razor_block
+    (at_block)
+    (declaration
+      (field_declaration
+        (type)
+        (variable_declarator)))
+    (declaration
+      (method_declaration
+        (identifier)
+        (parameter_list)
+        (block
+          (expression_statement
+            (assignment_expression
+              (identifier)
+              (integer_literal)))
+          (if_statement
+            (parenthesized_expression
+              (binary_expression
+                (identifier)
+                (integer_literal)))
+            (block
+              (expression_statement
+                (assignment_expression
+                  (identifier)
+                  (integer_literal))))))))))
+
+; =========================
+; Nested @code blocks (invalid, but should parse gracefully)
+; =========================
+@code {
+    void Outer() {
+        @code {
+            void Inner() { }
+        }
+    }
+}
+----
+(compilation_unit
+  (razor_block
+    (at_block)
+    (declaration
+      (method_declaration
+        (identifier)
+        (parameter_list)
+        (block
+          (razor_block
+            (at_block)
+            (declaration
+              (method_declaration
+                (identifier)
+                (parameter_list)
+                (block)))))))))
+
+; =========================
+; @functions block (legacy)
+; =========================
+@functions {
+    public string Name { get; set; }
+}
+----
+(compilation_unit
+  (razor_block
+    (at_block)
+    (declaration
+      (property_declaration
+        (modifier)
+        (type)
+        (variable_declarator)
+        (accessor_list)))))
+
+; =========================
+; Multiple directives
+; =========================
+@page "/fetchdata"
+@inject HttpClient Http
+@using System.Net.Http
+@layout MainLayout
+----
+(compilation_unit
+  (razor_page_directive
+    (at_page)
+    (string_literal))
+  (razor_inject_directive
+    (at_inject)
+    (variable_declaration
+      (type)
+      (variable_declarator)))
+  (razor_using_directive
+    (at_using)
+    (qualified_name))
+  (razor_layout_directive
+    (at_layout)
+    (qualified_name)))

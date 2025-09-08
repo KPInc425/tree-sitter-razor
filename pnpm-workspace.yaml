@@ -1,0 +1,4 @@
+onlyBuiltDependencies:
+  - tree-sitter
+  - tree-sitter-c-sharp
+  - tree-sitter-cli

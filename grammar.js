@@ -35,25 +35,24 @@ module.exports = grammar(CSHARP, {
 
   rules: {
     compilation_unit: ($) =>
-      seq(
-        repeat(
-          choice(
-            $.shebang_directive, // this is to make sharing highlights easier
-            $.razor_page_directive,
-            $.razor_using_directive,
-            $.razor_model_directive,
-            $.razor_rendermode_directive,
-            $.razor_inject_directive,
-            $.razor_implements_directive,
-            $.razor_layout_directive,
-            $.razor_inherits_directive,
-            $.razor_attribute_directive,
-            $.razor_typeparam_directive,
-            $.razor_namespace_directive,
-            $.razor_preservewhitespace_directive,
-          ),
+      repeat(
+        choice(
+          $.shebang_directive, // this is to make sharing highlights easier
+          $.razor_page_directive,
+          $.razor_using_directive,
+          $.razor_model_directive,
+          $.razor_rendermode_directive,
+          $.razor_inject_directive,
+          $.razor_implements_directive,
+          $.razor_layout_directive,
+          $.razor_inherits_directive,
+          $.razor_attribute_directive,
+          $.razor_typeparam_directive,
+          $.razor_namespace_directive,
+          $.razor_preservewhitespace_directive,
+          $.razor_block,
+          $._node,
         ),
-        repeat(choice($._node, $.razor_block)),
       ),
 
     _identifier_token: (_) =>
@@ -183,7 +182,14 @@ module.exports = grammar(CSHARP, {
             "at_block",
           ),
           "{",
-          repeat(choice($.declaration, seq($.statement), $._node)),
+          repeat(
+            choice(
+              $.declaration,
+              $.statement,
+              $.razor_block, // allow nested blocks
+              $._node,
+            ),
+          ),
           "}",
         ),
       ),
