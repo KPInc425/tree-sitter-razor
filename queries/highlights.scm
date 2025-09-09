@@ -1,33 +1,61 @@
 ; highlights.scm - Tree-sitter highlight queries for Razor/Blazor
 
-; Razor directives
-(at_page) @keyword
-(at_inject) @keyword
-(at_using) @keyword
-(at_model) @keyword
-(at_rendermode) @keyword
-(at_implements) @keyword
-(at_layout) @keyword
-(at_inherits) @keyword
-(at_attribute) @keyword
-(at_typeparam) @keyword
-(at_namespace) @keyword
-(at_preservewhitespace) @keyword
-(at_block) @keyword
-(at_if) @keyword
-(at_try) @keyword
-(at_catch) @keyword
-(at_finally) @keyword
-(at_else) @keyword
-(at_switch) @keyword
-(at_for) @keyword
-(at_foreach) @keyword
-(at_while) @keyword
-(at_do) @keyword
-(at_section) @keyword
-(at_await) @keyword
-(at_lock) @keyword
+; Razor directives (top-level nodes)
+(razor_page_directive) @keyword
+(razor_inject_directive) @keyword
+(razor_using_directive) @keyword
+(razor_model_directive) @keyword
+(razor_rendermode_directive) @keyword
+(razor_implements_directive) @keyword
+(razor_layout_directive) @keyword
+(razor_inherits_directive) @keyword
+(razor_attribute_directive) @keyword
+(razor_typeparam_directive) @keyword
+(razor_namespace_directive) @keyword
+(razor_preservewhitespace_directive) @keyword
+(razor_block) @keyword
+(razor_if) @keyword
+(razor_try) @keyword
+(razor_catch) @keyword
+(razor_finally) @keyword
+(razor_else) @keyword
+(razor_switch) @keyword
+(razor_for) @keyword
+(razor_foreach) @keyword
+(razor_while) @keyword
+(razor_do_while) @keyword
+(razor_section) @keyword
+(razor_await_expression) @keyword
+(razor_lock) @keyword
 (at_colon_transition) @keyword
+
+; Highlight the @ marker for directives (if present as a child node)
+(razor_page_directive (at_page) @keyword)
+(razor_inject_directive (at_inject) @keyword)
+(razor_using_directive (at_using) @keyword)
+(razor_model_directive (at_model) @keyword)
+(razor_rendermode_directive (at_rendermode) @keyword)
+(razor_implements_directive (at_implements) @keyword)
+(razor_layout_directive (at_layout) @keyword)
+(razor_inherits_directive (at_inherits) @keyword)
+(razor_attribute_directive (at_attribute) @keyword)
+(razor_typeparam_directive (at_typeparam) @keyword)
+(razor_namespace_directive (at_namespace) @keyword)
+(razor_preservewhitespace_directive (at_preservewhitespace) @keyword)
+(razor_block (at_block) @keyword)
+(razor_if (at_if) @keyword)
+(razor_try (at_try) @keyword)
+(razor_catch (at_catch) @keyword)
+(razor_finally (at_finally) @keyword)
+(razor_else (at_else) @keyword)
+(razor_switch (at_switch) @keyword)
+(razor_for (at_for) @keyword)
+(razor_foreach (at_foreach) @keyword)
+(razor_while (at_while) @keyword)
+(razor_do_while (at_do) @keyword)
+(razor_section (at_section) @keyword)
+(razor_await_expression (at_await) @keyword)
+(razor_lock (at_lock) @keyword)
 
 ; Razor comments
 (razor_comment) @comment
