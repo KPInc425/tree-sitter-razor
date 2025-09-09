@@ -70,13 +70,17 @@
       ]
     },
     "directive_argument": {
-      "type": "TOKEN",
+      "type": "PREC",
+      "value": -10,
       "content": {
-        "type": "PREC",
-        "value": 1,
+        "type": "TOKEN",
         "content": {
-          "type": "PATTERN",
-          "value": "[^\\s@{}<>]+"
+          "type": "PREC",
+          "value": 1,
+          "content": {
+            "type": "PATTERN",
+            "value": "[^\\s@{}<>]+"
+          }
         }
       }
     },
@@ -113,17 +117,6 @@
           "value": "}"
         }
       ]
-    },
-    "csharp_code_content": {
-      "type": "TOKEN",
-      "content": {
-        "type": "PREC",
-        "value": -1,
-        "content": {
-          "type": "PATTERN",
-          "value": "[^}]*"
-        }
-      }
     },
     "razor_expression": {
       "type": "SEQ",
@@ -507,7 +500,12 @@
     ]
   ],
   "precedences": [],
-  "externals": [],
+  "externals": [
+    {
+      "type": "SYMBOL",
+      "name": "csharp_code_content"
+    }
+  ],
   "inline": [],
   "supertypes": []
 }

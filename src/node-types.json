@@ -34,6 +34,11 @@
     }
   },
   {
+    "type": "directive_argument",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "element",
     "named": true,
     "fields": {},
@@ -317,10 +322,6 @@
   },
   {
     "type": "csharp_code_content",
-    "named": true
-  },
-  {
-    "type": "directive_argument",
     "named": true
   },
   {

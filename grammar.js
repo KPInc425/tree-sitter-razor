@@ -14,6 +14,8 @@ const CSHARP = require("tree-sitter-c-sharp/grammar");
 module.exports = grammar({
   name: "razor",
 
+  externals: ($) => [$.csharp_code_content],
+
   conflicts: ($) => [[$.razor_directive, $.razor_expression]],
 
   // Whitespace and comments
@@ -45,13 +47,14 @@ module.exports = grammar({
           $.identifier,
         ),
       ),
-    directive_argument: ($) => token(prec(1, /[^\s@{}<>]+/)),
+    // Only allow directive_argument outside of code blocks
+    directive_argument: ($) => prec(-10, token(prec(1, /[^\s@{}<>]+/))),
 
     // Razor code block: @code { ... }
-    // Mark content as csharp_code_content for language injection by the editor
+    // Strict: only allow csharp_code_content inside braces
     razor_code_block: ($) =>
       seq("@", choice("code", "functions"), "{", $.csharp_code_content, "}"),
-    csharp_code_content: ($) => token(prec(-1, /[^}]*/)),
+    // csharp_code_content is now provided by the external scanner
 
     // Razor inline expression: e.g., @DateTime.Now
     razor_expression: ($) =>
