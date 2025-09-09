@@ -1,0 +1,20 @@
+@page "/sample"
+@using System
+
+@* A small sample Razor/Blazor component for parser testing *@
+
+<div class="card" id="sample-@DateTime.Now.Ticks">
+  <h2>Current time: <span class="time">@DateTime.Now.ToString("HH:mm:ss")</span></h2>
+  <p>Year: @DateTime.Now.Year</p>
+
+  <label for="msg">Message</label>
+  <input id="msg" @bind="message" placeholder="Type..." />
+
+  <button @onclick="() => message = message + \"!\"">Add Exclamation</button>
+
+  <img src="https://example.com/logo.png" alt="logo" />
+</div>
+
+@code {
+  private string message = "hello";
+}

@@ -454,9 +454,10 @@ module.exports = grammar(CSHARP, {
         ),
       ),
 
-    start_tag: ($) => seq("<", $.tag_name, $._attributes, ">"),
-    self_closing_tag: ($) => seq("<", $.tag_name, $._attributes, "/>"),
-    end_tag: ($) => seq("</", $.tag_name, ">"),
+    start_tag: ($) => seq("<", field("name", $.tag_name), $._attributes, ">"),
+    self_closing_tag: ($) =>
+      seq("<", field("name", $.tag_name), $._attributes, "/>"),
+    end_tag: ($) => seq("</", field("name", $.tag_name), ">"),
 
     html_text: (_) => token(/[^<>&@\s]([^<>&@]*[^<>&@\s])?/),
 
