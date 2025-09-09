@@ -100,6 +100,7 @@ module.exports = grammar(CSHARP, {
           $.razor_lock,
           $.element,
           $.html_comment,
+          $.html_text,
         ),
       ),
 
