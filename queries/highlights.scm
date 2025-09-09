@@ -27,35 +27,9 @@
 (razor_section) @keyword
 (razor_await_expression) @keyword
 (razor_lock) @keyword
-(at_colon_transition) @keyword
+(explicit_line_transition) @keyword
 
-; Highlight the @ marker for directives (if present as a child node)
-(razor_page_directive (at_page) @keyword)
-(razor_inject_directive (at_inject) @keyword)
-(razor_using_directive (at_using) @keyword)
-(razor_model_directive (at_model) @keyword)
-(razor_rendermode_directive (at_rendermode) @keyword)
-(razor_implements_directive (at_implements) @keyword)
-(razor_layout_directive (at_layout) @keyword)
-(razor_inherits_directive (at_inherits) @keyword)
-(razor_attribute_directive (at_attribute) @keyword)
-(razor_typeparam_directive (at_typeparam) @keyword)
-(razor_namespace_directive (at_namespace) @keyword)
-(razor_preservewhitespace_directive (at_preservewhitespace) @keyword)
-(razor_block (at_block) @keyword)
-(razor_if (at_if) @keyword)
-(razor_try (at_try) @keyword)
-(razor_catch (at_catch) @keyword)
-(razor_finally (at_finally) @keyword)
-(razor_else (at_else) @keyword)
-(razor_switch (at_switch) @keyword)
-(razor_for (at_for) @keyword)
-(razor_foreach (at_foreach) @keyword)
-(razor_while (at_while) @keyword)
-(razor_do_while (at_do) @keyword)
-(razor_section (at_section) @keyword)
-(razor_await_expression (at_await) @keyword)
-(razor_lock (at_lock) @keyword)
+
 
 ; Razor comments
 (razor_comment) @comment
@@ -84,12 +58,12 @@
   (_tag_name) @tag
   ">" @tag.delimiter)
 (element
-  (_end_tag
+  (end_tag
     "</" @tag.delimiter
-    (_tag_name) @tag
+    (tag_name) @tag
     ">" @tag.delimiter))
-(_html_attribute_name) @attribute
-(_boolean_html_attribute) @attribute
+(html_attribute_name) @attribute
+(boolean_html_attribute) @attribute
 
 ; Razor attribute names
 (razor_attribute_name) @attribute
