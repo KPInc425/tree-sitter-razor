@@ -7,7 +7,7 @@
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
 
-const CSHARP = require("tree-sitter-c-sharp/grammar");
+const CSHARP = require("../tree-sitter-c-sharp-razor/grammar");
 
 module.exports = grammar(CSHARP, {
   name: "razor",
@@ -41,6 +41,13 @@ module.exports = grammar(CSHARP, {
     [$.generic_name, $.razor_inherits_directive],
     [$.attribute_argument, $._expression_statement_expression],
     [$._node, $.element],
+    [$.compilation_unit, $._node],
+    [$.using_directive, $._reserved_identifier],
+    [$.yield_statement, $._reserved_identifier],
+    [$.expression_statement, $.non_lvalue_expression],
+    [$._expression_statement_expression, $.razor_block],
+    [$.throw_statement, $.throw_expression],
+    [$._expression_statement_expression],
     // Removed unnecessary conflict: [$.attribute, $.type]
     ...o,
   ],
@@ -64,6 +71,7 @@ module.exports = grammar(CSHARP, {
           $.razor_preservewhitespace_directive,
           $.razor_block,
           $._node,
+          $.element,
         ),
       ),
 
@@ -211,14 +219,7 @@ module.exports = grammar(CSHARP, {
             "at_block",
           ),
           "{",
-          repeat(
-            choice(
-              $.declaration,
-              $.statement,
-              $.razor_block, // allow nested blocks
-              $._node,
-            ),
-          ),
+          optional($.class_body_fragment), // Allow empty or non-empty @code blocks
           "}",
         ),
       ),
@@ -448,7 +449,10 @@ module.exports = grammar(CSHARP, {
     _html_attribute_value_content: ($) =>
       choice(
         $.razor_explicit_expression,
+
         $.razor_implicit_expression,
+
+        $.expression, // Allow any C# expression
         prec.left(/[^"]+/),
       ),
 
@@ -490,7 +494,7 @@ module.exports = grammar(CSHARP, {
     html_text: (_) => token(prec(-1, /[^<>&@\s][^<>&@]*/)),
 
     razor_attribute_value: ($) =>
-      seq('"', optional($.modifier), $.expression, '"'),
+      seq('"', repeat($._html_attribute_value_content), '"'),
 
     razor_html_attribute: ($) =>
       seq($.razor_attribute_name, optional(seq("=", $.razor_attribute_value))),
@@ -500,7 +504,11 @@ module.exports = grammar(CSHARP, {
         $.self_closing_tag,
         prec.dynamic(
           1,
-          seq($.start_tag, repeat(choice($._node, $.html_text)), $.end_tag),
+          seq(
+            $.start_tag,
+            repeat(choice($._node, $.html_text, $.razor_block)),
+            $.end_tag,
+          ),
         ),
       ),
   },
