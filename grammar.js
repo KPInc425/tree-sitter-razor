@@ -427,55 +427,48 @@ module.exports = grammar(CSHARP, {
     _html_comment_text: (_) => repeat1(/.|\n|\r/),
 
     // HTML Base Definitions
-    _tag_name: (_) => token(/[a-zA-Z0-9-:]+/),
-    tag_name: ($) => $._tag_name,
-    end_tag: ($) => seq("</", $.tag_name, ">"),
-    _html_attribute_name: (_) => token(/[a-zA-Z0-9-:]+/),
-    html_attribute_name: ($) => $._html_attribute_name,
-    _boolean_html_attribute: (_) => token(/[a-zA-Z0-9-:]+/),
-    boolean_html_attribute: ($) => $._boolean_html_attribute,
-    html_attribute_value: ($) =>
-      seq(
-        '"',
-        optional(
-          choice(
-            $.razor_explicit_expression,
-            $.razor_implicit_expression,
-            prec.left(/[a-zA-Z0-9-:/\.=>(){}\s]+/),
-          ),
-        ),
-        '"',
-      ),
-    html_text: (_) => token(/[^<>&@.(\s]([^<>&@]*[^<>&@\s])?/),
+    tag_name: (_) => token(/[a-zA-Z0-9-:]+/),
+    html_attribute_name: (_) => token(/[a-zA-Z0-9-:]+/),
+    boolean_html_attribute: ($) => $.html_attribute_name,
 
-    razor_attribute_value: ($) =>
-      seq('"', optional($.modifier), $.expression, '"'),
+    _html_attribute_value_content: ($) =>
+      choice(
+        $.razor_explicit_expression,
+        $.razor_implicit_expression,
+        prec.left(/[^"]+/),
+      ),
+
+    html_attribute_value: ($) =>
+      seq('"', repeat($._html_attribute_value_content), '"'),
 
     html_attribute: ($) =>
       seq($.html_attribute_name, "=", $.html_attribute_value),
+
+    _attributes: ($) =>
+      repeat(
+        choice(
+          $.html_attribute,
+          $.boolean_html_attribute,
+          $.razor_html_attribute,
+        ),
+      ),
+
+    start_tag: ($) => seq("<", $.tag_name, $._attributes, ">"),
+    self_closing_tag: ($) => seq("<", $.tag_name, $._attributes, "/>"),
+    end_tag: ($) => seq("</", $.tag_name, ">"),
+
+    html_text: (_) => token(/[^<>&@\s]([^<>&@]*[^<>&@\s])?/),
+
+    razor_attribute_value: ($) =>
+      seq('"', optional($.modifier), $.expression, '"'),
 
     razor_html_attribute: ($) =>
       seq($.razor_attribute_name, optional(seq("=", $.razor_attribute_value))),
 
     element: ($) =>
-      seq(
-        "<",
-        $.tag_name,
-        optional(
-          repeat(
-            prec.left(
-              seq(
-                choice(
-                  $.html_attribute,
-                  $.boolean_html_attribute,
-                  $.razor_html_attribute,
-                ),
-                optional(" "),
-              ),
-            ),
-          ),
-        ),
-        choice("/>", seq(">", repeat(choice($._node, $.html_text)), $.end_tag)),
+      choice(
+        $.self_closing_tag,
+        seq($.start_tag, repeat(choice($._node, $.html_text)), $.end_tag),
       ),
   },
 });
