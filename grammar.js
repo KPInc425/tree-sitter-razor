@@ -453,6 +453,30 @@ module.exports = grammar(CSHARP, {
 
     razor_html_attribute: ($) =>
       seq($.razor_attribute_name, optional(seq("=", $.razor_attribute_value))),
+
+    element: ($) =>
+      seq(
+        "<",
+        $._tag_name,
+        optional(
+          repeat(
+            prec.left(
+              seq(
+                choice(
+                  $._html_attribute,
+                  $._boolean_html_attribute,
+                  $.razor_html_attribute,
+                ),
+                optional(" "),
+              ),
+            ),
+          ),
+        ),
+        choice(
+          "/>",
+          seq(">", repeat(choice($._node, $._html_text)), $._end_tag),
+        ),
+      ),
   },
 });
 
