@@ -428,7 +428,7 @@ module.exports = grammar(CSHARP, {
     _html_comment_text: (_) => repeat1(/.|\n|\r/),
 
     // HTML Base Definitions
-    tag_name: (_) => token(/[a-zA-Z0-9-:]+/),
+    tag_name: ($) => alias(token(/[a-zA-Z0-9-:]+/), "tag_name"),
     html_attribute_name: (_) => token(/[a-zA-Z0-9-:]+/),
     boolean_html_attribute: ($) => $.html_attribute_name,
 

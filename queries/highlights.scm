@@ -28,12 +28,22 @@
   "</" @tag.delimiter
   name: (tag_name) @tag
   ">" @tag.delimiter)
+; Minimal HTML: only highlight literal tag delimiters (safe, token-level)
 "<" @tag.delimiter
 ">" @tag.delimiter
 "</" @tag.delimiter
 "/>" @tag.delimiter
 
-; Razor attribute names
+(start_tag
+  "<" @tag.delimiter
+  name: (tag_name) @tag
+  ">" @tag.delimiter)
+(end_tag
+  "</" @tag.delimiter
+  name: (tag_name) @tag
+  ">" @tag.delimiter)
+
+; Razor attribute markers
 (razor_attribute_name) @attribute
 
 ; Operators and punctuation (kept minimal)
