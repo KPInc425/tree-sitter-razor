@@ -55,7 +55,7 @@
 ; HTML tags and attributes
 (element
   "<" @tag.delimiter
-  (_tag_name) @tag
+  (tag_name) @tag
   ">" @tag.delimiter)
 (element
   (end_tag

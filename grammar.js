@@ -427,10 +427,10 @@ module.exports = grammar(CSHARP, {
     _html_comment_text: (_) => repeat1(/.|\n|\r/),
 
     // HTML Base Definitions
-    tag_name: (_) => /[a-zA-Z0-9-:]+/,
+    tag_name: (_) => token(/[a-zA-Z0-9-:]+/),
     end_tag: ($) => seq("</", $.tag_name, ">"),
-    html_attribute_name: (_) => /[a-zA-Z0-9-:]+/,
-    boolean_html_attribute: (_) => /[a-zA-Z0-9-:]+/,
+    html_attribute_name: (_) => token(/[a-zA-Z0-9-:]+/),
+    boolean_html_attribute: (_) => token(/[a-zA-Z0-9-:]+/),
     html_attribute_value: ($) =>
       seq(
         '"',
@@ -443,7 +443,7 @@ module.exports = grammar(CSHARP, {
         ),
         '"',
       ),
-    html_text: (_) => /[^<>&@.(\s]([^<>&@]*[^<>&@\s])?/,
+    html_text: (_) => token(/[^<>&@.(\s]([^<>&@]*[^<>&@\s])?/),
 
     razor_attribute_value: ($) =>
       seq('"', optional($.modifier), $.expression, '"'),
