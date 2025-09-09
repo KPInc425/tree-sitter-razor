@@ -34,33 +34,6 @@
     }
   },
   {
-    "type": "block",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "element",
-          "named": true
-        },
-        {
-          "type": "html_text",
-          "named": true
-        },
-        {
-          "type": "razor_code_content",
-          "named": true
-        },
-        {
-          "type": "razor_expression",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "element",
     "named": true,
     "fields": {},
@@ -143,7 +116,7 @@
       "required": true,
       "types": [
         {
-          "type": "block",
+          "type": "csharp_code_content",
           "named": true
         }
       ]
@@ -343,6 +316,10 @@
     "named": false
   },
   {
+    "type": "csharp_code_content",
+    "named": true
+  },
+  {
     "type": "directive_argument",
     "named": true
   },
@@ -364,10 +341,6 @@
   },
   {
     "type": "identifier",
-    "named": true
-  },
-  {
-    "type": "razor_code_content",
     "named": true
   },
   {

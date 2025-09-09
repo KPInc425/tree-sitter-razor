@@ -2,12 +2,14 @@
  * Standalone Razor grammar for Tree-sitter (full refactor)
  * - No inheritance from C# grammar
  * - Top-level: HTML, Razor directives, Razor expressions
- * - C# embedding in @code blocks (to be implemented)
+ * - C# embedding in @code blocks: content is marked as `csharp_code_content` for language injection by the editor
  * - Foundation for robust Razor/HTML/C# blending
  */
 
 /// <reference types="tree-sitter-cli/dsl" />
 // @ts-check
+
+const CSHARP = require("tree-sitter-c-sharp/grammar");
 
 module.exports = grammar({
   name: "razor",
@@ -46,23 +48,10 @@ module.exports = grammar({
     directive_argument: ($) => token(prec(1, /[^\s@{}<>]+/)),
 
     // Razor code block: @code { ... }
-    // For now, just treat as opaque content; C# embedding to be added
-    razor_code_block: ($) => seq("@", choice("code", "functions"), $.block),
-    block: ($) =>
-      seq(
-        "{",
-        repeat(
-          choice(
-            $.razor_code_content,
-            $.razor_expression,
-            $.element,
-            $.html_text,
-          ),
-        ),
-        "}",
-      ),
-    // Placeholder for C# code inside @code blocks (to be replaced with C# embedding)
-    razor_code_content: ($) => token(prec(-1, /[^{}@<]+/)),
+    // Mark content as csharp_code_content for language injection by the editor
+    razor_code_block: ($) =>
+      seq("@", choice("code", "functions"), "{", $.csharp_code_content, "}"),
+    csharp_code_content: ($) => token(prec(-1, /[^}]*/)),
 
     // Razor inline expression: e.g., @DateTime.Now
     razor_expression: ($) =>
