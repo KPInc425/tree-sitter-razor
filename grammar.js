@@ -30,6 +30,18 @@ module.exports = grammar(CSHARP, {
 
     [$.initializer_expression, $.razor_block],
     [$.field_declaration, $.local_declaration_statement],
+    [$._name, $.razor_using_directive],
+    [$._simple_name, $.generic_name, $.razor_using_directive],
+    [$._simple_name, $.razor_using_directive],
+    [$.attribute, $._name],
+    [$.attribute, $._simple_name],
+    [$.generic_name, $.razor_model_directive],
+    [$.generic_name, $.razor_implements_directive],
+    [$.generic_name, $.razor_layout_directive],
+    [$.generic_name, $.razor_inherits_directive],
+    [$.attribute_argument, $._expression_statement_expression],
+    [$._node, $.element],
+    // Removed unnecessary conflict: [$.attribute, $.type]
     ...o,
   ],
 
@@ -428,7 +440,8 @@ module.exports = grammar(CSHARP, {
     _html_comment_text: (_) => repeat1(/.|\n|\r/),
 
     // HTML Base Definitions
-    tag_name: ($) => alias(token(/[a-zA-Z0-9-:]+/), "tag_name"),
+    // Dummy wrapper to force node emission
+    tag_name: ($) => seq(field("tag", alias(/[a-zA-Z0-9-:]+/, "tag_name"))),
     html_attribute_name: (_) => token(/[a-zA-Z0-9-:]+/),
     boolean_html_attribute: ($) => $.html_attribute_name,
 
@@ -445,21 +458,36 @@ module.exports = grammar(CSHARP, {
     html_attribute: ($) =>
       seq($.html_attribute_name, "=", $.html_attribute_value),
 
-    _attributes: ($) =>
-      repeat(
-        choice(
-          $.html_attribute,
-          $.boolean_html_attribute,
-          $.razor_html_attribute,
+    start_tag: ($) =>
+      seq(
+        "<",
+        field("name", $.tag_name),
+        repeat(
+          choice(
+            $.html_attribute,
+            $.boolean_html_attribute,
+            $.razor_html_attribute,
+          ),
         ),
+        ">",
       ),
-
-    start_tag: ($) => seq("<", field("name", $.tag_name), $._attributes, ">"),
     self_closing_tag: ($) =>
-      seq("<", field("name", $.tag_name), $._attributes, "/>"),
+      seq(
+        "<",
+        field("name", $.tag_name),
+        repeat(
+          choice(
+            $.html_attribute,
+            $.boolean_html_attribute,
+            $.razor_html_attribute,
+          ),
+        ),
+        "/>",
+      ),
     end_tag: ($) => seq("</", field("name", $.tag_name), ">"),
 
-    html_text: (_) => token(/[^<>&@\s]([^<>&@]*[^<>&@\s])?/),
+    // Make html_text more restrictive so it cannot start with '<'
+    html_text: (_) => token(prec(-1, /[^<>&@\s][^<>&@]*/)),
 
     razor_attribute_value: ($) =>
       seq('"', optional($.modifier), $.expression, '"'),
@@ -470,7 +498,10 @@ module.exports = grammar(CSHARP, {
     element: ($) =>
       choice(
         $.self_closing_tag,
-        seq($.start_tag, repeat(choice($._node, $.html_text)), $.end_tag),
+        prec.dynamic(
+          1,
+          seq($.start_tag, repeat(choice($._node, $.html_text)), $.end_tag),
+        ),
       ),
   },
 });
