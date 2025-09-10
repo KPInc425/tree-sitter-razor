@@ -14,9 +14,16 @@ const CSHARP = require("tree-sitter-c-sharp/grammar");
 module.exports = grammar({
   name: "razor",
 
-  externals: ($) => [$.csharp_code_content],
+  // External tokens provided by the scanner
+  externals: ($) => [$.csharp_code_content, $.razor_attribute_value_content],
 
-  conflicts: ($) => [[$.razor_directive, $.razor_expression]],
+  // Conflict resolution for ambiguous parses between HTML/attribute content and embedded C#
+  conflicts: ($) => [
+    [$.attribute_value, $.razor_attribute_value_content],
+    [$.attribute_value_content, $.razor_attribute_value_content],
+    [$.source_file, $.html_text],
+    [$.razor_directive, $.razor_expression],
+  ],
 
   // Whitespace and comments
   extras: ($) => [/\s/, $.razor_comment, $.html_comment],
@@ -26,11 +33,12 @@ module.exports = grammar({
     source_file: ($) =>
       repeat(
         choice(
+          $.razor_code_block, // Only allow code blocks at the top level, before anything else
           $.razor_directive,
-          $.razor_code_block,
           $.razor_expression,
           $.element,
           $.html_text,
+          $.razor_error, // fallback for lone @
         ),
       ),
 
@@ -80,30 +88,41 @@ module.exports = grammar({
             choice(
               $.element,
               $.html_text,
-              $.razor_expression,
-              $.razor_code_block,
+              $.razor_expression, // Only allow razor_expression, NOT razor_code_block
             ),
           ),
           $.end_tag,
         ),
       ),
-    start_tag: ($) => seq("<", $.tag_name, repeat($.attribute), ">"),
+    start_tag: ($) =>
+      seq("<", $.tag_name, repeat(choice($.attribute, $.razor_attribute)), ">"),
     end_tag: ($) => seq("</", $.tag_name, ">"),
-    self_closing_tag: ($) => seq("<", $.tag_name, repeat($.attribute), "/>"),
+    self_closing_tag: ($) =>
+      seq(
+        "<",
+        $.tag_name,
+        repeat(choice($.attribute, $.razor_attribute)),
+        "/>",
+      ),
     tag_name: ($) => /[a-zA-Z][a-zA-Z0-9-]*/,
 
     attribute: ($) =>
       seq($.attribute_name, optional(seq("=", $.attribute_value))),
+    razor_attribute: ($) =>
+      seq("@", $.identifier, optional(seq("=", $.attribute_value))),
     attribute_name: ($) => /[a-zA-Z_:][a-zA-Z0-9_:.-]*/,
+    // Attribute values are parsed entirely by the external scanner (razor_attribute_value_content).
+    // The external scanner is responsible for handling embedded Razor expressions and any C#-like content,
+    // so attribute_value_content delegates directly to the external token.
     attribute_value: ($) =>
       choice(
-        seq('"', repeat($.attribute_value_content), '"'),
-        seq("'", repeat($.attribute_value_content), "'"),
+        seq('"', optional($.razor_attribute_value_content), '"'),
+        seq("'", optional($.razor_attribute_value_content), "'"),
       ),
-    attribute_value_content: ($) => token(prec(-1, /[^"'@<>{}]+/)),
+    attribute_value_content: ($) => $.razor_attribute_value_content,
 
     // HTML text (not starting with <, @, or {)
-    html_text: ($) => token(prec(-10, /[^<@{}][^<@{}]*/)),
+    html_text: ($) => prec(1, token(prec(-10, /[^<@{}][^<@{}]*/))),
 
     // Razor comment: @* ... *@
     razor_comment: ($) => seq("@*", repeat(/[^*]+|\*+[^@*]/), "*@"),
@@ -113,5 +132,9 @@ module.exports = grammar({
 
     // Identifiers (for directives, expressions, etc.)
     identifier: ($) => /[a-zA-Z_][a-zA-Z0-9_]*/,
+
+    // Fallback for lone @ not matching any known construct
+
+    razor_error: ($) => seq("@", token.immediate(/[^\s{]/)),
   },
 });

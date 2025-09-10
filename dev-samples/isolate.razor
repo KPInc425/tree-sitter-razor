@@ -1,0 +1,15 @@
+@page "/isolate"
+
+<div>
+  <h2>Current time: <span>time</span></h2>
+  <p>Year: 2024</p>
+  <label for="msg">Message</label>
+  <input id="msg" @bind="message" placeholder="sample-@DateTime.Now.Ticks" />
+  <button @onclick="() => message = message + \"!\"">Add Exclamation</button>
+  <img src="https://example.com/logo.png" alt="logo" />
+</div>
+
+@code {
+  int x = 1;
+  string s = "test";
+}

@@ -23,11 +23,11 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "attribute_value_content",
+          "type": "razor_attribute_value_content",
           "named": true
         }
       ]
@@ -56,10 +56,6 @@
         },
         {
           "type": "html_text",
-          "named": true
-        },
-        {
-          "type": "razor_code_block",
           "named": true
         },
         {
@@ -113,6 +109,30 @@
     "fields": {}
   },
   {
+    "type": "html_text",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "razor_attribute",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute_value",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "razor_code_block",
     "named": true,
     "fields": {},
@@ -156,6 +176,11 @@
     }
   },
   {
+    "type": "razor_error",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "razor_expression",
     "named": true,
     "fields": {},
@@ -184,6 +209,10 @@
       "types": [
         {
           "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "razor_attribute",
           "named": true
         },
         {
@@ -219,6 +248,10 @@
           "named": true
         },
         {
+          "type": "razor_error",
+          "named": true
+        },
+        {
           "type": "razor_expression",
           "named": true
         }
@@ -235,6 +268,10 @@
       "types": [
         {
           "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "razor_attribute",
           "named": true
         },
         {
@@ -313,10 +350,6 @@
     "named": true
   },
   {
-    "type": "attribute_value_content",
-    "named": true
-  },
-  {
     "type": "code",
     "named": false
   },
@@ -337,11 +370,11 @@
     "named": false
   },
   {
-    "type": "html_text",
+    "type": "identifier",
     "named": true
   },
   {
-    "type": "identifier",
+    "type": "razor_attribute_value_content",
     "named": true
   },
   {
