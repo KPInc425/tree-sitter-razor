@@ -6,6 +6,7 @@
 <div class="card" id="sample-@DateTime.Now.Ticks">
   <h2>Current time: <span class="time">@DateTime.Now.ToString("HH:mm:ss")</span></h2>
   <p>Year: @DateTime.Now.Year</p>
+  <InputText class="input input-bordered w-full" @bind-Value="FirstName" />
 
   <label for="msg">Message</label>
   <input id="msg" @bind="message" placeholder="Type..." />

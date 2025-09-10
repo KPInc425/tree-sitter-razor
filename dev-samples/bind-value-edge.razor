@@ -1,0 +1,8 @@
+@page "/bind-value-edge"
+
+<div>
+  <input @bind-Value="FirstName" placeholder="Enter your first name" />
+  <input @bind-Value='LastName' placeholder='Enter your last name' />
+  <button @onclick="() => Save()">Save</button>
+  <span>@FirstName @LastName</span>
+</div>

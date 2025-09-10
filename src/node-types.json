@@ -23,11 +23,23 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
-          "type": "razor_attribute_value_content",
+          "type": "razor_attribute_value_expr_double",
+          "named": true
+        },
+        {
+          "type": "razor_attribute_value_expr_single",
+          "named": true
+        },
+        {
+          "type": "razor_attribute_value_text_double",
+          "named": true
+        },
+        {
+          "type": "razor_attribute_value_text_single",
           "named": true
         }
       ]
@@ -185,8 +197,23 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
+      "types": [
+        {
+          "type": "razor_expression_inner",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "razor_expression_inner",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
       "types": [
         {
           "type": "expression_argument_list",
@@ -374,7 +401,19 @@
     "named": true
   },
   {
-    "type": "razor_attribute_value_content",
+    "type": "razor_attribute_value_expr_double",
+    "named": true
+  },
+  {
+    "type": "razor_attribute_value_expr_single",
+    "named": true
+  },
+  {
+    "type": "razor_attribute_value_text_double",
+    "named": true
+  },
+  {
+    "type": "razor_attribute_value_text_single",
     "named": true
   },
   {
