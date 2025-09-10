@@ -15,12 +15,22 @@ module.exports = grammar({
   name: "razor",
 
   // External tokens provided by the scanner
-  externals: ($) => [$.csharp_code_content, $.razor_attribute_value_content],
+  // Split attribute value externals into double- and single-quoted variants so the scanner
+  // can mark content boundaries precisely (excluding the surrounding quotes).
+  externals: ($) => [
+    $.csharp_code_content,
+    $.razor_attribute_value_content_double,
+    $.razor_attribute_value_content_single,
+  ],
 
   // Conflict resolution for ambiguous parses between HTML/attribute content and embedded C#
+  // Include both double- and single-quoted external tokens so conflicts are resolved
+  // against the exact externals provided by the scanner.
   conflicts: ($) => [
-    [$.attribute_value, $.razor_attribute_value_content],
-    [$.attribute_value_content, $.razor_attribute_value_content],
+    [$.attribute_value, $.razor_attribute_value_content_double],
+    [$.attribute_value, $.razor_attribute_value_content_single],
+    [$.attribute_value_content, $.razor_attribute_value_content_double],
+    [$.attribute_value_content, $.razor_attribute_value_content_single],
     [$.source_file, $.html_text],
     [$.razor_directive, $.razor_expression],
   ],
@@ -116,10 +126,17 @@ module.exports = grammar({
     // so attribute_value_content delegates directly to the external token.
     attribute_value: ($) =>
       choice(
-        seq('"', optional($.razor_attribute_value_content), '"'),
-        seq("'", optional($.razor_attribute_value_content), "'"),
+        // Use separate external tokens for double- and single-quoted attribute content.
+        // This allows the external scanner to mark the inner content boundaries precisely
+        // (so the injection/query can avoid including the surrounding quotes).
+        seq('"', optional($.razor_attribute_value_content_double), '"'),
+        seq("'", optional($.razor_attribute_value_content_single), "'"),
       ),
-    attribute_value_content: ($) => $.razor_attribute_value_content,
+    attribute_value_content: ($) =>
+      choice(
+        $.razor_attribute_value_content_double,
+        $.razor_attribute_value_content_single,
+      ),
 
     // HTML text (not starting with <, @, or {)
     html_text: ($) => prec(1, token(prec(-10, /[^<@{}][^<@{}]*/))),
