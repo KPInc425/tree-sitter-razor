@@ -31,3 +31,5 @@
 
 ; Highlight literal text outside tags
 (text) @text.literal
+
+(razor_directive) @keyword

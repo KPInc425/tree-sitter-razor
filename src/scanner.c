@@ -62,8 +62,16 @@ bool tree_sitter_razor_external_scanner_scan(void *payload, TSLexer *lexer, cons
         }
       }
 
-      // Otherwise, treat as directive if allowed
-      if (valid_symbols[RAZOR_DIRECTIVE]) {
+      // Only treat as directive if identifier matches a known directive
+      const char *directives[] = {"page", "using", "inherits", "layout", "functions", "section", "inject", NULL};
+      bool is_directive = false;
+      for (int i = 0; directives[i]; i++) {
+        if (strcmp(buf, directives[i]) == 0) {
+          is_directive = true;
+          break;
+        }
+      }
+      if (is_directive && valid_symbols[RAZOR_DIRECTIVE]) {
         // Optionally consume argument(s) until newline, <, or {
         while (lexer->lookahead != 0 && lexer->lookahead != '\n' && lexer->lookahead != '<' && lexer->lookahead != '{') {
           lexer->advance(lexer, false);
