@@ -1,0 +1,92 @@
+@page "/test-injection"
+@using System
+@using System.Collections.Generic
+@using System.Linq
+@using System.Threading.Tasks
+
+<div class="container">
+    <h1>Razor C# Injection Test</h1>
+
+    <!-- Basic expressions -->
+    <p>Current time: @DateTime.Now</p>
+    <p>Tomorrow: @DateTime.Now.AddDays(1).ToShortDateString()</p>
+    <p>Complex expression: @(1 + 2 * 3)</p>
+
+    <!-- Directive attributes -->
+    <button @onclick="IncrementCounter">Click me</button>
+    <input @bind="UserInput" @bind:event="oninput" placeholder="Type something..." />
+
+    <!-- Attribute with embedded expression -->
+    <div id="item-@Guid.NewGuid().ToString("N")" class="@(IsActive ? "active" : "inactive")">
+        Dynamic ID and class
+    </div>
+
+    <!-- Conditional display -->
+    @if (Counter > 5)
+    {
+        <p class="warning">Counter is greater than 5!</p>
+    }
+    else
+    {
+        <p>Counter is @Counter</p>
+    }
+
+    <!-- Loop -->
+    <ul>
+        @foreach (var item in Items)
+        {
+            <li>@item</li>
+        }
+    </ul>
+
+    <!-- Nested code -->
+    @{
+        var message = $"Hello {UserInput ?? "World"}";
+        var calculated = CalculateValue(Counter);
+    }
+
+    <p>Message: @message</p>
+    <p>Calculated: @calculated</p>
+</div>
+
+@code {
+    private int Counter { get; set; } = 0;
+    private string UserInput { get; set; } = string.Empty;
+    private bool IsActive { get; set; } = true;
+    private List<string> Items { get; set; } = new List<string> { "Item 1", "Item 2", "Item 3" };
+
+    private void IncrementCounter()
+    {
+        Counter++;
+        IsActive = !IsActive;
+
+        // Add a new item when counter is even
+        if (Counter % 2 == 0)
+        {
+            Items.Add($"New Item {Counter}");
+        }
+    }
+
+    private int CalculateValue(int input)
+    {
+        return input * input + 5; // Square plus 5
+    }
+
+    protected override void OnInitialized()
+    {
+        // This method is called when component is initialized
+        Console.WriteLine("Component initialized!");
+    }
+
+    // Interface implementation
+    public interface ITestInterface
+    {
+        void TestMethod();
+    }
+
+    // Class with generic type
+    public class TestClass<T> where T : class
+    {
+        public T Value { get; set; }
+    }
+}

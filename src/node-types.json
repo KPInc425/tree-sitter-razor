@@ -29,6 +29,10 @@
         {
           "type": "attribute_value_content",
           "named": true
+        },
+        {
+          "type": "razor_expression",
+          "named": true
         }
       ]
     }
@@ -47,6 +51,10 @@
         },
         {
           "type": "element",
+          "named": true
+        },
+        {
+          "type": "html_comment",
           "named": true
         },
         {
@@ -77,6 +85,11 @@
     }
   },
   {
+    "type": "html_comment",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "razor_comment",
     "named": true,
     "fields": {}
@@ -92,6 +105,10 @@
       "types": [
         {
           "type": "element",
+          "named": true
+        },
+        {
+          "type": "html_comment",
           "named": true
         },
         {
@@ -130,11 +147,19 @@
     "named": false
   },
   {
+    "type": "-->",
+    "named": false
+  },
+  {
     "type": "/>",
     "named": false
   },
   {
     "type": "<",
+    "named": false
+  },
+  {
+    "type": "<!--",
     "named": false
   },
   {

@@ -13,6 +13,10 @@
           },
           {
             "type": "SYMBOL",
+            "name": "html_comment"
+          },
+          {
+            "type": "SYMBOL",
             "name": "razor_code_block"
           },
           {
@@ -67,6 +71,10 @@
                   {
                     "type": "SYMBOL",
                     "name": "razor_comment"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "html_comment"
                   },
                   {
                     "type": "SYMBOL",
@@ -182,8 +190,17 @@
             {
               "type": "REPEAT",
               "content": {
-                "type": "SYMBOL",
-                "name": "attribute_value_content"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "attribute_value_content"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "razor_expression"
+                  }
+                ]
               }
             },
             {
@@ -202,8 +219,17 @@
             {
               "type": "REPEAT",
               "content": {
-                "type": "SYMBOL",
-                "name": "attribute_value_content"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "attribute_value_content"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "razor_expression"
+                  }
+                ]
               }
             },
             {
@@ -216,7 +242,7 @@
     },
     "attribute_value_content": {
       "type": "PATTERN",
-      "value": "[^\"']+"
+      "value": "[^\"'@]+"
     },
     "razor_comment": {
       "type": "SEQ",
@@ -232,6 +258,23 @@
         {
           "type": "STRING",
           "value": "*@"
+        }
+      ]
+    },
+    "html_comment": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "<!--"
+        },
+        {
+          "type": "PATTERN",
+          "value": "([^-]|-[^-]|--[^>])*"
+        },
+        {
+          "type": "STRING",
+          "value": "-->"
         }
       ]
     },
@@ -277,6 +320,10 @@
     {
       "type": "SYMBOL",
       "name": "razor_expression"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "razor_expression_content"
     }
   ],
   "inline": [],

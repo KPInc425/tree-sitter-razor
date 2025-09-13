@@ -1,13 +1,19 @@
 module.exports = grammar({
   name: "razor",
 
-  externals: ($) => [$.razor_code_block, $.razor_directive, $.razor_expression],
+  externals: ($) => [
+    $.razor_code_block,
+    $.razor_directive,
+    $.razor_expression,
+    $.razor_expression_content,
+  ],
 
   rules: {
     source_file: ($) =>
       repeat(
         choice(
           $.razor_comment, // most specific
+          $.html_comment, // HTML comments
           $.razor_code_block, // next most specific
           $.razor_directive, // next
           $.razor_expression, // generic fallback
@@ -26,6 +32,7 @@ module.exports = grammar({
           repeat(
             choice(
               $.razor_comment,
+              $.html_comment,
               $.razor_code_block,
               $.razor_directive,
               $.razor_expression,
@@ -46,14 +53,25 @@ module.exports = grammar({
     attribute_name: ($) => /@?[a-zA-Z_:][a-zA-Z0-9_:.-]*/,
     attribute_value: ($) =>
       choice(
-        seq('"', repeat($.attribute_value_content), '"'),
-        seq("'", repeat($.attribute_value_content), "'"),
+        seq(
+          '"',
+          repeat(choice($.attribute_value_content, $.razor_expression)),
+          '"',
+        ),
+        seq(
+          "'",
+          repeat(choice($.attribute_value_content, $.razor_expression)),
+          "'",
+        ),
       ),
-    attribute_value_content: ($) => /[^"']+/,
+    attribute_value_content: ($) => /[^"'@]+/,
 
     razor_comment: ($) => seq("@*", /([^*]|\*+[^@*])*/, "*@"),
 
-    // razor_directive, razor_code_block, and razor_expression are now external tokens only
+    // HTML comments
+    html_comment: ($) => seq("<!--", /([^-]|-[^-]|--[^>])*/, "-->"),
+
+    // razor_directive, razor_code_block, and razor_expression are external tokens
 
     directive_argument: ($) =>
       choice(
