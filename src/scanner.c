@@ -1,4 +1,4 @@
-#include <tree_sitter/parser.h>
+#include "tree_sitter/parser.h"
 #include <wctype.h>
 #include <ctype.h>
 #include <string.h>
@@ -36,19 +36,19 @@ static void skip_balanced(TSLexer *lexer, int open, int close) {
 // Helper to scan an identifier
 static bool scan_identifier(TSLexer *lexer, char *buffer, int max_len) {
   int pos = 0;
-  
+
   // First character must be alpha or underscore
   if (!(iswalpha(lexer->lookahead) || lexer->lookahead == '_')) {
     return false;
   }
-  
+
   // Collect identifier into buffer
-  while ((iswalpha(lexer->lookahead) || isdigit(lexer->lookahead) || 
+  while ((iswalpha(lexer->lookahead) || isdigit(lexer->lookahead) ||
           lexer->lookahead == '_') && pos < max_len - 1) {
     buffer[pos++] = (char)lexer->lookahead;
     lexer->advance(lexer, false);
   }
-  
+
   buffer[pos] = '\0';
   return pos > 0;
 }
@@ -63,24 +63,24 @@ bool tree_sitter_razor_external_scanner_scan(void *payload, TSLexer *lexer, cons
     char identifier[32] = {0};
     if (scan_identifier(lexer, identifier, sizeof(identifier))) {
       // Check for code block: @code { ... } or @functions { ... }
-      if (strcmp(identifier, "code") == 0 || 
+      if (strcmp(identifier, "code") == 0 ||
           strcmp(identifier, "functions") == 0 ||
-          strcmp(identifier, "section") == 0 || 
+          strcmp(identifier, "section") == 0 ||
           strcmp(identifier, "helper") == 0) {
-        
+
         // Skip whitespace and newlines
-        while (lexer->lookahead == ' ' || lexer->lookahead == '\t' || 
+        while (lexer->lookahead == ' ' || lexer->lookahead == '\t' ||
                lexer->lookahead == '\r' || lexer->lookahead == '\n') {
           lexer->advance(lexer, false);
         }
-        
+
         if (lexer->lookahead == '{') {
           // Mark starting position
           lexer->mark_end(lexer);
-          
+
           // Consume balanced braces (including nested)
           skip_balanced(lexer, '{', '}');
-          
+
           lexer->result_symbol = RAZOR_CODE_BLOCK;
           return true;
         }
@@ -88,11 +88,11 @@ bool tree_sitter_razor_external_scanner_scan(void *payload, TSLexer *lexer, cons
 
       // Check for known directives
       const char *directives[] = {
-        "page", "using", "inherits", "layout", "functions", 
-        "section", "inject", "model", "implements", "addTagHelper", 
+        "page", "using", "inherits", "layout", "functions",
+        "section", "inject", "model", "implements", "addTagHelper",
         "removeTagHelper", "tagHelperPrefix", "namespace", NULL
       };
-      
+
       bool is_directive = false;
       for (int i = 0; directives[i]; i++) {
         if (strcmp(identifier, directives[i]) == 0) {
@@ -100,16 +100,16 @@ bool tree_sitter_razor_external_scanner_scan(void *payload, TSLexer *lexer, cons
           break;
         }
       }
-      
+
       if (is_directive && valid_symbols[RAZOR_DIRECTIVE]) {
         // Optionally consume argument(s) until newline, <, or {
-        while (lexer->lookahead != 0 && 
-               lexer->lookahead != '\n' && 
-               lexer->lookahead != '<' && 
+        while (lexer->lookahead != 0 &&
+               lexer->lookahead != '\n' &&
+               lexer->lookahead != '<' &&
                lexer->lookahead != '{') {
           lexer->advance(lexer, false);
         }
-        
+
         lexer->result_symbol = RAZOR_DIRECTIVE;
         return true;
       }
@@ -125,22 +125,22 @@ bool tree_sitter_razor_external_scanner_scan(void *payload, TSLexer *lexer, cons
     if (lexer->lookahead == '(') {
       // Mark the start of the expression
       lexer->mark_end(lexer);
-      
+
       // Consume the opening paren and capture the balanced expression
       skip_balanced(lexer, '(', ')');
-      
+
       lexer->result_symbol = RAZOR_EXPRESSION;
       return true;
     }
-    
+
     // Handle @{...} expressions (implicit expressions)
     if (lexer->lookahead == '{') {
       // Mark the start of the expression
       lexer->mark_end(lexer);
-      
+
       // Consume the opening brace and capture the balanced expression
       skip_balanced(lexer, '{', '}');
-      
+
       lexer->result_symbol = RAZOR_EXPRESSION;
       return true;
     }
@@ -151,6 +151,6 @@ bool tree_sitter_razor_external_scanner_scan(void *payload, TSLexer *lexer, cons
       return true;
     }
   }
-  
+
   return false;
 }
